@@ -16,6 +16,34 @@
 #  along with optimus.  If not, see <http://www.gnu.org/licenses/>.
 
 class Optimus
-    Version = '0.0.1'
+
+    class Data
+
+        attr_reader :data
+
+        def initialize
+            @data = Hash.new
+        end
+
+        def add_opt opt
+            if opt.empty?
+                return
+            end
+            @data.store opt, Array.new
+        end
+
+        def add_arg opt, arg
+            if opt.empty? || arg.empty?
+                return
+            end
+            @data[opt] << arg
+        end
+
+        def to_hash
+            @data
+        end
+
+    end
+
 end
 

@@ -15,7 +15,34 @@
 #  You should have received a copy of the GNU General Public License
 #  along with optimus.  If not, see <http://www.gnu.org/licenses/>.
 
+require 'optimus/parser'
+require 'optimus/data'
+require 'ostruct'
+
 class Optimus
-    Version = '0.0.1'
+
+    class << self
+        def parse ary=nil
+            ary = ary || ARGV
+
+            @_parse_opts = OpenStruct.new(
+                :separator     => '-',
+                :max_opts      => 0,
+                :max_args      => 0, # max amount of args per opt
+                :delete_parsed => false
+            )
+            
+            if block_given?
+               yield @_parse_opts 
+            end
+
+            @parser = Parser.new ary, @_parse_opts
+            @parser.parse
+        end
+
+        def parse! ary=nil
+        end
+    end
+
 end
 
