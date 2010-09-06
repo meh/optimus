@@ -30,7 +30,6 @@ opt = Optimus.new do |opt|
         :short  => 'c',
         :desc   => 'config file' 
     ).args do |arg|
-        arg.lol
         arg.set ( Hash[
             :name => 'config file',
             :desc => 'set configuration file path'

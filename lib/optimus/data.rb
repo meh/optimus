@@ -70,7 +70,7 @@ class Optimus
 
         def set_args hash_args, affected_opt=nil
             affected_opt ||= @_context
-            if !hash_opts.has_key? :name
+            if !hash_args.has_key? :name
                 raise 'Options must have a :name.'
             end
             if send(affected_opt).arguments.methods.include? hash_args[:name]
