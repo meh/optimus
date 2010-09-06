@@ -6,7 +6,7 @@
 
 require 'optimus/mini'
 
-resp = Optimus.parse(ARGV).to_hash # or Optimus.parse(ARGV).to_hash
+resp = Optimus.parse.to_hash # or Optimus.parse(ARGV).to_hash
 
 # ./mini.rb -v -c ~/.config
 

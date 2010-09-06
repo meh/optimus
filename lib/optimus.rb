@@ -21,30 +21,24 @@ require 'optimus/data'
 
 class Optimus
 
-    def initialize
-        @_parser = Parser.new
-        
-        if block_given
-            yield @_parser
+    attr_reader :_data
+
+    def initialize ary=nil
+        ary ||= ARGV
+        #@_parser = Parser.new ary 
+        @_data    = Data.new
+
+        if block_given?
+            yield @_data
         end
     end
 
     def parse ary=nil
-
-        if block_given
+        if block_given?
             yield @_parse_opts
         end
-
     end
 
-    def parse!
+    def parse
     end
-
-    @_parse_opts = OpenStruct.new {
-        :separator  = '-',
-        :max_opts   = 0,
-        :max_args   = 0, # max amount of arguments, per opt
-        :del_parsed = false
-    }
-
 end
