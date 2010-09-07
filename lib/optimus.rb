@@ -15,43 +15,5 @@
 #  You should have received a copy of the GNU General Public License
 #  along with optimus.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'optimus/mini'
-require 'optimus/parser'
-require 'optimus/data'
-require 'forwardable'
-
-class Optimus
-
-    attr_reader :_data
-
-    extend Forwardable
-
-    def_delegators :@_data, :to_hash, :options, :arguments, :options_name, :arguments_name, :<<
-    
-    def initialize ary=nil
-        ary ||= ARGV
-        #@_parser = Parser.new ary 
-        @_data    = Data.new
-
-        if block_given?
-            yield @_data
-        end
-    end
-
-    def parse ary=nil
-        if block_given?
-            yield @_parse_opts
-        end
-    end
-
-    def self.new_opt hash
-        Data.new.set hash
-    end
-
-    def method_missing meth, *args
-        @_data.send(meth, *args)
-    end
-
-    def parse
-    end
-end
+require 'optimus/optimus'
+require 'optimus/version'

@@ -2,9 +2,9 @@
 Gem::Specification.new do |s|
     s.name           = 'optimus'
     s.version        = '0.0.1'
-    s.author         = 'tilde'
-    s.email          = 'tilde@autistici.org'
-    s.homepage       = 'http://github.com/tilde/shura'
+    s.authors        = ['tilde', 'meh.']
+    s.email          = ['tilde@autistici.org', 'meh.ffff@gmail.com']
+    s.homepage       = 'http://github.com/tilde/optimus'
     s.description    = 'An automated yet fully customizable command line options parser.'
     s.summary        = 'A command line opt parser.'
     s.require_path   = 'lib'

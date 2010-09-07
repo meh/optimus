@@ -17,6 +17,13 @@
 #  along with optimus.  If not, see <http://www.gnu.org/licenses/>.
 
 class Optimus
-    Version = '0.0.1'
+
+class Interface
+    attr_reader :implementation
+
+    def initialize (implementation)
+        @implementation = implementation
+    end
 end
 
+end

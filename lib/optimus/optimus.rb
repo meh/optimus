@@ -16,7 +16,29 @@
 #  You should have received a copy of the GNU General Public License
 #  along with optimus.  If not, see <http://www.gnu.org/licenses/>.
 
-class Optimus
-    Version = '0.0.1'
-end
+require 'optimus/options'
 
+class Optimus
+    attr_reader :options, :implementation
+
+    # Initialize Optimus with an array of options or ARGV
+    def initialize (values=ARGV, implementation=Implementations::Standard.new)
+        @options        = Options.parse(implementation, values)
+        @implementation = parser
+
+        if block_given?
+            yield @options
+        end
+    end
+
+    # Parse additional options and merge them to the Optimus object
+    def parse (values, parserOptions=nil)
+        options = Options.parse(values, @implementation, parserOptions)
+
+        if block_given?
+            yield options
+        end
+
+        @options.merge(options)
+    end
+end
