@@ -16,7 +16,25 @@
 #  You should have received a copy of the GNU General Public License
 #  along with optimus.  If not, see <http://www.gnu.org/licenses/>.
 
-class Optimus
-    Version = '0.0.1'
-end
+require 'ostruct'
 
+class Optimus
+    class Option < OpenStruct
+        attr_accessor :name
+
+        def initialize (arguments)
+            if !arguments.is_a? Hash
+                raise 'You have to pass a Hash'
+            end
+
+            if !arguments[:name]
+                raise 'You have to give a name to this option.'
+            end
+
+            super(arguments)
+        end
+
+        alias to_hash marshal_dump
+        alias to_h    marshal_dump
+    end
+end

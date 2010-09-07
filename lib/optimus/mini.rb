@@ -1,4 +1,5 @@
 #  Copyright (C) 2010 tilde  [tilde AT autistici DOT org]
+#                     meh    [meh.ffff AT gmail DOT com]
 #
 #  This file is part of optimus.
 #  
@@ -15,11 +16,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with optimus.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'optimus/parser'
-require 'optimus/data'
 require 'ostruct'
 
 class Optimus
+    Mini
 
     class << self
         def parse ary=nil

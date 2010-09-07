@@ -1,22 +1,15 @@
 #! /usr/bin/env ruby
 #
-# This example only shows how optimus
-# will handle the definition of your
-# options.
-# As you can see, the external interface
-# is completely customizable. You can use
-# both block syntax or define your options
-# via plain methods.
-# It's also eaisily hackable, probably in
-# the future i'll write some interfaces
-# to do things in different ways. Emulate
-# the interface of any other option parser
+# This example only shows how optimus will handle the definition of your options.
+# As you can see the external interface is completely customizable.
+# You can use both block syntax or define your options via plain methods.
+# It's also easily hackable, probably in the future I'll write some interfaces
+# to do things in different ways. Emulating the interface of another option parser
 # is quite simple.
 
 require 'optimus'
 
 opt = Optimus.new do |opt|
-
     opt.set(
         :name   => 'verbose',
         :short  => 'c',
@@ -53,7 +46,7 @@ opt << Optimus.new_opt(
     arg.set(:name=>'level')
 end.execute {puts "Tryin to debug me uhu?"}
 
-opt.options.each_pair do |i, e|
+opt.options.each do |i, e|
     puts "#{i} => #{e}"
     if e.code
         e.code.call ''

@@ -1,4 +1,5 @@
 #  Copyright (C) 2010 tilde  [tilde AT autistici DOT org]
+#                     meh    [meh.ffff AT gmail DOT com]
 #
 #  This file is part of optimus.
 #  
@@ -15,42 +16,20 @@
 #  You should have received a copy of the GNU General Public License
 #  along with optimus.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'optimus/data'
-require 'ostruct'
-
 class Optimus
 
-    class Parser
+class Parser
+    attr_reader :implementation, :options
 
-        attr_accessor :_parse_opts
+    def initialize (implementation, options=nil)
+        @implementation = implementation
 
-        def initialize ary, parser_opts, data_file
-            @_ary        = ary
-            @_parse_opts = parse_opts
-            @resp        = Data.new
-        end
-
-        def parse ary=nil, parse_opts=nil
-            @ary        = ary || @_ary
-            @parse_opts = parse_opts || @_parse_opts
-
-            self.tokenize
-        end
-
-        def tokenize
-            ary = @ary
-            active = ''
-            ary.each do |i|
-                if i.match(/^#{Regexp.escape(@_parse_opts.separator)}/)
-                    opt = i.delete @_parse_opts.separator
-                    active = opt
-                    @resp.add_opt opt
-                else
-                    @resp.add_arg active, i
-                end
-            end
-            @resp
+        if !options.is_a? Hash
+            @options = {}
+        else
+            @options = options
         end
     end
 end
 
+end

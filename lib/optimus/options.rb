@@ -16,7 +16,23 @@
 #  You should have received a copy of the GNU General Public License
 #  along with optimus.  If not, see <http://www.gnu.org/licenses/>.
 
+require 'optimus/option'
+
 class Optimus
-    Version = '0.0.1'
+    class Options
+        attr_reader :implementation
+
+        def self.parse (values, implementation, parserOptions=nil)
+            implementation.parser.parse(values, parserOptions)
+        end
+
+        def initialize (implementation)
+            @implementation = implementation
+        end
+
+        def method_missing (method, *args, &block)
+            @implementation.interface.send(method, *args, &block)
+        end
+    end
 end
 
