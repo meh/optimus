@@ -18,11 +18,16 @@
 require 'optimus/mini'
 require 'optimus/parser'
 require 'optimus/data'
+require 'forwardable'
 
 class Optimus
 
     attr_reader :_data
 
+    extend Forwardable
+
+    def_delegators :@_data, :to_hash, :options, :arguments, :options_name, :arguments_name
+    
     def initialize ary=nil
         ary ||= ARGV
         #@_parser = Parser.new ary 
@@ -37,6 +42,14 @@ class Optimus
         if block_given?
             yield @_parse_opts
         end
+    end
+
+    def self.new_opt hash
+        OpenStruct.new hash
+    end
+
+    def method_missing meth, *args
+        @_data.send(meth, *args)
     end
 
     def parse

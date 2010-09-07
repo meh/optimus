@@ -40,7 +40,20 @@ opt = Optimus.new do |opt|
 
 end
 
-opt._data.to_hash.each_pair do |i, e|
+# :D
+puts opt.verbose.code = proc {puts "I'm again oh so verbose."}
+
+# : D
+opt.debug = Optimus.new_opt(
+    :code      => proc { puts "Tryin to debug me uhu?" },
+    :name      => 'debug',
+    :short     => 'd',
+    :desc      => 'operates in debug mode',
+)
+
+opt.options.each_pair do |i, e|
     puts "#{i} => #{e}"
-    e.code.call ''
+    if e.code
+        e.code.call ''
+    end
 end

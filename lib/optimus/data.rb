@@ -138,6 +138,30 @@ class Optimus
         def merge other
         end
 
+        def options
+            marshal_dump
+        end
+
+        def options_name
+            marshal_dump.keys
+        end
+
+        def arguments opt
+            if send(opt).arguments
+                send(opt).arguments.marshal_dump
+            else
+                nil
+            end
+        end
+
+        def arguments_name opt
+            if arguments(opt).nil?
+                nil
+            else
+                arguments(opt).keys
+            end
+        end
+
         def to_hash
             #TODO better this.
             marshal_dump

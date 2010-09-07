@@ -24,7 +24,7 @@ class Optimus
 
         attr_accessor :_parse_opts
 
-        def initialize ary, parse_opts
+        def initialize ary, parser_opts, data_file
             @_ary        = ary
             @_parse_opts = parse_opts
             @resp        = Data.new
