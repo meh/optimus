@@ -41,15 +41,17 @@ opt = Optimus.new do |opt|
 end
 
 # :D
-puts opt.verbose.code = proc {puts "I'm again oh so verbose."}
+opt.verbose.code = proc {puts "I'm again oh so verbose."}
 
 # : D
-opt.debug = Optimus.new_opt(
+opt << Optimus.new_opt(
     :code      => proc { puts "Tryin to debug me uhu?" },
     :name      => 'debug',
     :short     => 'd',
     :desc      => 'operates in debug mode',
-)
+).args do |arg|
+    arg.set(:name=>'level')
+end.execute {puts "Tryin to debug me uhu?"}
 
 opt.options.each_pair do |i, e|
     puts "#{i} => #{e}"

@@ -37,9 +37,12 @@ class Optimus
         attr_accessor :_context
 
         def initialize start_opts=nil, context=nil
-            super()
             if start_opts.respond_to? :marshal_dump
                 marshal_load(start_opts.marshal_dump)
+            elsif start_opts.kind_of? Hash
+                super start_opts
+            else
+                super()
             end
             @_context = context
         end
@@ -59,9 +62,8 @@ class Optimus
             if !hash_opts.has_key? :name
                 raise 'Options must have a :name.'
             end
-            if !respond_to?(hash_opts[:name])
-                create_opt hash_opts[:name]
-            end
+            create_opt hash_opts[:name]
+
             hash_opts.each_pair do |opt_name, opt_value|
                 add_opt opt_name, opt_value
             end
@@ -92,8 +94,10 @@ class Optimus
             if !respond_to?(:opt)
                 new_ostruct_member opt
             end
-            send "#{opt}=", OpenStruct.new(:code=>nil) 
-            @_context = opt
+            if !send(opt)
+                send "#{opt}=", OpenStruct.new(:code=>nil) 
+                @_context = opt
+            end
             self
         end
 
@@ -101,7 +105,9 @@ class Optimus
 
         def add_opt option, value, affected_opt=nil
             affected_opt ||= @_context
-            send(affected_opt).send("#{option}=", value)
+            if !send(affected_opt).send(option)
+                send(affected_opt).send("#{option}=", value)
+            end
             self
         end
 
@@ -136,19 +142,27 @@ class Optimus
         alias attach_code execute
 
         def merge other
+            if other.kind_of? Data
+                other.table.each_pair do |k, v|
+                    @table[k] = v
+                end
+            end
+            self
         end
 
+        alias << merge
+
         def options
-            marshal_dump
+           @table 
         end
 
         def options_name
-            marshal_dump.keys
+            @table.keys
         end
 
         def arguments opt
             if send(opt).arguments
-                send(opt).arguments.marshal_dump
+                send(opt).arguments.table
             else
                 nil
             end
@@ -166,6 +180,7 @@ class Optimus
             #TODO better this.
             marshal_dump
         end
+
     end
 
     class Args < Data

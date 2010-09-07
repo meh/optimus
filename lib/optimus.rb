@@ -26,7 +26,7 @@ class Optimus
 
     extend Forwardable
 
-    def_delegators :@_data, :to_hash, :options, :arguments, :options_name, :arguments_name
+    def_delegators :@_data, :to_hash, :options, :arguments, :options_name, :arguments_name, :<<
     
     def initialize ary=nil
         ary ||= ARGV
@@ -45,7 +45,7 @@ class Optimus
     end
 
     def self.new_opt hash
-        OpenStruct.new hash
+        Data.new.set hash
     end
 
     def method_missing meth, *args
