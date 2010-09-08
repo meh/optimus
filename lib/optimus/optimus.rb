@@ -23,8 +23,8 @@ class Optimus
 
     # Initialize Optimus with an array of options or ARGV
     def initialize (values=ARGV, implementation=Implementations::Standard.new)
-        @options        = Options.parse(implementation, values)
-        @implementation = parser
+        @options        = Options.parse(values, implementation)
+        @implementation = implementation
 
         if block_given?
             yield @options
@@ -39,6 +39,8 @@ class Optimus
             yield options
         end
 
-        @options.merge(options)
+        @options.merge!(options)
+
+        return options
     end
 end
