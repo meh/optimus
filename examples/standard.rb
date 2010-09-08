@@ -2,10 +2,10 @@
 require 'optimus'
 
 opt = Optimus.new {|o|
-    o.set({
+    o.set(
         :long  => 'config',
         :short => 'c'
-    })
+    )
 }
 
 puts "Parameters: #{opt.options.parameters}"
