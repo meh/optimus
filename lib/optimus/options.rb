@@ -22,12 +22,22 @@ class Optimus
     class Options
         attr_reader :implementation
 
-        def self.parse (values, implementation, parserOptions=nil)
-            implementation.parser.parse(values, parserOptions)
+        def self.parse (options, values, implementation, parserOptions=nil)
+            result = Options.new(implementation)
+
+            options.each {|option|
+                result.set(option)
+            }
+
+            implementation.parser.parse(result, values, parserOptions)
         end
 
         def initialize (implementation)
             @implementation = implementation
+        end
+
+        def parse (values, options=nil)
+            @implementation.parser.parse(self, values, options)
         end
 
         def method_missing (method, *args, &block)
