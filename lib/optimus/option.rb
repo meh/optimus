@@ -27,10 +27,6 @@ class Optimus
                 raise 'You have to pass a Hash'
             end
 
-            if !arguments[:name]
-                raise 'You have to give a name to this option.'
-            end
-
             super(arguments)
         end
 

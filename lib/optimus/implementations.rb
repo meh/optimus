@@ -1,5 +1,4 @@
 #  Copyright (C) 2010 tilde  [tilde AT autistici DOT org]
-#                     meh    [meh.ffff AT gmail DOT com]
 #
 #  This file is part of optimus.
 #  
@@ -16,33 +15,4 @@
 #  You should have received a copy of the GNU General Public License
 #  along with optimus.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'ostruct'
-
-class Optimus
-    Mini
-
-    class << self
-        def parse ary=nil
-            ary = ary || ARGV
-
-            @_parse_opts = OpenStruct.new(
-                :separator     => '-',
-                :max_opts      => 0,
-                :max_args      => 0, # max amount of args per opt
-                :delete_parsed => false
-            )
-            
-            if block_given?
-               yield @_parse_opts 
-            end
-
-            @parser = Parser.new ary, @_parse_opts
-            @parser.parse
-        end
-
-        def parse! ary=nil
-        end
-    end
-
-end
-
+require 'optimus/implementations/standard'

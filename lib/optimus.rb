@@ -16,4 +16,6 @@
 #  along with optimus.  If not, see <http://www.gnu.org/licenses/>.
 
 require 'optimus/optimus'
+require 'optimus/implementations'
+
 require 'optimus/version'

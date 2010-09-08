@@ -30,6 +30,10 @@ class Parser
             @options = options
         end
     end
+
+    def inspect
+        "#<Parser:#{@options.inspect}>"
+    end
 end
 
 end

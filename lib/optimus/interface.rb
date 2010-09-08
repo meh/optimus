@@ -18,11 +18,18 @@
 
 class Optimus
 
+# This is only an abstract class to implement Optimus interfaces.
+#
+# Required methods are: LOL I DUNNO
 class Interface
     attr_reader :implementation
 
     def initialize (implementation)
         @implementation = implementation
+    end
+
+    def inspect
+        "#<Interface>"
     end
 end
 
