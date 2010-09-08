@@ -47,13 +47,11 @@ class Standard < Implementation
             end
         end
     
-        def parse (values, options=nil)
-            options = {} if !options.is_a? Hash
-
-            result  = Options.new(@implementation)
-            options = @options.merge(options)
-            active  = nil
-            type    = nil
+        def parse (result, values, options=nil)
+            result  ||= Options.new(@implementation)
+            options   = @options.merge(options) if options.is_a? Hash
+            active    = nil
+            type      = nil
     
             values.each {|value|
                 if active
@@ -68,7 +66,7 @@ class Standard < Implementation
                     if matches = value.match(/^#{Regexp.escape(@options[:separators][:long])}(\w+)$/)
                         active = matches[1]
                         type = :long
-                    elsif matches = value.match(/^#{Regexp.escape(@options[:separators][:long])}(\w+)$/)
+                    elsif matches = value.match(/^#{Regexp.escape(@options[:separators][:short])}(\w+)$/)
                         if matches[1].length == 1
                             active = matches[1]
                             type = :short
@@ -120,8 +118,8 @@ class Standard < Implementation
         end
 
         def set (arguments)
-            if !arguments[:name]
-                raise 'You have to pass a name.'
+            if !arguments[:long] && !arguments[:short]
+                raise 'You have to pass at least :long or :short.'
             end
 
             option = Option.new(arguments)
@@ -140,14 +138,14 @@ class Standard < Implementation
             @data[:parameters].each {|key, value|
                 if value[:type] == :long
                     if @options[key]
-                        @parameters[@options[key].long]  = value[:value]
-                        @parameters[@options[key].short] = value[:value]
+                        @parameters[@options[key].long.to_sym]  = value[:value]
+                        @parameters[@options[key].short.to_sym] = value[:value]
                     end
                 else
-                    @options.each {|option|
+                    @options.each_value {|option|
                         if option.short == key
-                            @parameters[option.long]  = value[:value]
-                            @parameters[option.short] = value[:value]
+                            @parameters[option.long.to_sym]  = value[:value]
+                            @parameters[option.short.to_sym] = value[:value]
                         end
                     }
                 end

@@ -22,18 +22,27 @@ class Optimus
     attr_reader :options, :implementation
 
     # Initialize Optimus with an array of options or ARGV
-    def initialize (values=ARGV, implementation=Implementations::Standard.new)
-        @options        = Options.parse(values, implementation)
-        @implementation = implementation
+    def initialize (*args)
+        if !block_given?
+            options = args.shift || []
+        end
+
+        values         = args.shift || ARGV
+        implementation = args.shift || Implementations::Standard.new
 
         if block_given?
-            yield @options
+            yield @options = Options.new(implementation)
+            @options.parse(values)
+        else
+            @options = Options.parse(options, values, implementation)
         end
+
+        @implementation = implementation
     end
 
     # Parse additional options and merge them to the Optimus object
     def parse (values, parserOptions=nil)
-        options = Options.parse(values, @implementation, parserOptions)
+        options = Options.parse(@options.options, values, @implementation, parserOptions)
 
         if block_given?
             yield options
