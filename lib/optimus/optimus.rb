@@ -52,4 +52,8 @@ class Optimus
 
         return options
     end
+
+    def method_missing (method, *args, &block)
+        @options.send(method, *args, &block)
+    end
 end

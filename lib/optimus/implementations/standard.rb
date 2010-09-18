@@ -48,7 +48,6 @@ class Standard < Implementation
         end
     
         def parse (result, values, options=nil)
-            result  ||= Options.new(@implementation)
             options   = @options.merge(options) if options.is_a? Hash
             active    = nil
             type      = nil
@@ -118,11 +117,12 @@ class Standard < Implementation
         end
 
         def set (arguments)
-            if !arguments[:long] && !arguments[:short]
-                raise 'You have to pass at least :long or :short.'
+            if !arguments[:long]
+                raise 'You have to pass at least :long.'
             end
 
-            option = Option.new(arguments)
+            option      = Option.new(arguments)
+            option.name = arguments[:long]
 
             @options[option.name] = option
         end
@@ -134,6 +134,13 @@ class Standard < Implementation
         def normalize
             @parameters = {}
             @arguments  = @data[:arguments]
+
+            @options.each_value {|option|
+              if option.default
+                @parameters[option.long.to_sym]  = option.default
+                @parameters[option.short.to_sym] = option.default
+              end
+            }
 
             @data[:parameters].each {|key, value|
                 if value[:type] == :long
@@ -149,6 +156,14 @@ class Standard < Implementation
                         end
                     }
                 end
+            }
+
+            @options.each_value {|option|
+              case option.type
+                when :numeric
+                  @parameters[option.long.to_sym]  = @parameters[option.long.to_sym].to_i
+                  @parameters[option.short.to_sym] = @parameters[option.short.to_sym].to_i
+              end
             }
         end
     end
