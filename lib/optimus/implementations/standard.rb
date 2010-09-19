@@ -1,5 +1,5 @@
 #  Copyright (C) 2010 tilde  [tilde AT autistici DOT org]
-#                     meh    [meh.ffff AT gmail DOT com]
+#           meh  [meh.ffff AT gmail DOT com]
 #
 #  This file is part of optimus.
 #  
@@ -17,6 +17,7 @@
 #  along with optimus.  If not, see <http://www.gnu.org/licenses/>.
 
 require 'forwardable'
+require 'date'
 
 require 'optimus/option'
 require 'optimus/options'
@@ -30,147 +31,165 @@ class Optimus
 module Implementations
 
 class Standard < Implementation
-    class Parser < Optimus::Parser
-        def initialize (implementation, options=nil)
-            super(implementation, options)
-    
-            if !@options[:separators]
-                @options[:separators] = {}
-            end
-    
-            if !@options[:separators][:long]
-                @options[:separators][:long] = '--'
-            end
-    
-            if !@options[:separators][:short]
-                @options[:separators][:short] = '-'
-            end
-        end
-    
-        def parse (result, values, options=nil)
-            options   = @options.merge(options) if options.is_a? Hash
-            active    = nil
-            type      = nil
-    
-            values.each {|value|
-                if active
-                    if value.match(/^#{Regexp.escape(@options[:separators][:long])}|#{Regexp.escape(@options[:separators][:short])}\w/)
-                        result.data[:parameters][active] = { :type => type, :value => true }
-                    else
-                        result.data[:parameters][active] = { :type => type, :value => value }
-                    end
+  class Parser < Optimus::Parser
+    def initialize (implementation, options=nil)
+      super(implementation, options)
+  
+      if !@options[:separators]
+        @options[:separators] = {}
+      end
+  
+      if !@options[:separators][:long]
+        @options[:separators][:long] = '--'
+      end
+  
+      if !@options[:separators][:short]
+        @options[:separators][:short] = '-'
+      end
+    end
+  
+    def parse (result, values, options=nil)
+      options   = @options.merge(options) if options.is_a? Hash
+      active  = nil
+      type    = nil
+  
+      values.each {|value|
+        if active
+          if value.match(/^#{Regexp.escape(@options[:separators][:long])}|#{Regexp.escape(@options[:separators][:short])}\w/)
+            result.data[:parameters][active] = { :type => type, :value => true }
+          else
+            result.data[:parameters][active] = { :type => type, :value => value }
+          end
 
-                    active = nil
-                else
-                    if matches = value.match(/^#{Regexp.escape(@options[:separators][:long])}(\w+)$/)
-                        active = matches[1]
-                        type = :long
-                    elsif matches = value.match(/^#{Regexp.escape(@options[:separators][:short])}(\w+)$/)
-                        if matches[1].length == 1
-                            active = matches[1]
-                            type = :short
-                        else
-                            matches[1].chars.each {|char|
-                                result.data[:parameters][char] = { :type => :short, :value => true }
-                            }
-                        end
-                    else
-                        result.data[:arguments] << value
-                    end
-                end
-            }
-
-            result.normalize
-            result
+          active = nil
+        else
+          if matches = value.match(/^#{Regexp.escape(@options[:separators][:long])}(\w+)$/)
+            active = matches[1]
+            type = :long
+          elsif matches = value.match(/^#{Regexp.escape(@options[:separators][:short])}(\w+)$/)
+            if matches[1].length == 1
+              active = matches[1]
+              type = :short
+            else
+              matches[1].chars.each {|char|
+                result.data[:parameters][char] = { :type => :short, :value => true }
+              }
+            end
+          else
+            result.data[:arguments] << value
+          end
         end
+      }
+
+      result.normalize
+      result
+    end
+  end
+
+  class Interface < Optimus::Interface
+    attr_reader :parameters, :arguments, :options, :data
+
+    alias params parameters
+    alias args   arguments
+
+    extend Forwardable
+
+    def_delegators :@options, :each_value, :merge!
+
+    alias each each_value
+
+    def initialize (implementation)
+      super(implementation)
+
+      @options = {}
+
+      @data = {
+        :parameters => {},
+        :arguments  => []
+      }
+
+      @internal = {}
     end
 
-    class Interface < Optimus::Interface
-        attr_reader :parameters, :arguments, :options, :data
+    def merge (hash)
+      result = self.clone
+      result.merge! hash
+      result
+    end
 
-        alias params parameters
-        alias args   arguments
+    def set (arguments)
+      if !arguments[:long]
+        raise 'You have to pass at least :long.'
+      end
 
-        extend Forwardable
+      arguments[:long]  = arguments[:long].to_sym
+      arguments[:short] = arguments[:short].to_sym if arguments[:short]
 
-        def_delegators :@options, :each_value, :merge!
+      option    = Option.new(arguments)
+      option.name = arguments[:long]
 
-        alias each each_value
+      @options[option.name] = option
+    end
 
-        def initialize (implementation)
-            super(implementation)
+    def get (name)
+      @options[name]
+    end
 
-            @options = {}
+    def normalize
+      @parameters = {}
+      @arguments  = @data[:arguments]
 
-            @data = {
-                :parameters => {},
-                :arguments  => []
-            }
-
-            @internal = {}
+      @options.each_value {|option|
+        if option.default
+          @parameters[option.long]  = option.default
+          @parameters[option.short] = option.default
         end
+      }
 
-        def merge (hash)
-            result = self.clone
-            result.merge! hash
-            result
-        end
-
-        def set (arguments)
-            if !arguments[:long]
-                raise 'You have to pass at least :long.'
+      @data[:parameters].each {|key, value|
+        if value[:type] == :long
+          if @options[key]
+            @parameters[@options[key].long]  = value[:value]
+            @parameters[@options[key].short] = value[:value]
+          end
+        else
+          @options.each_value {|option|
+            if option.short == key
+              @parameters[option.long]  = value[:value]
+              @parameters[option.short] = value[:value]
             end
+          }
+        end
+      }
 
-            option      = Option.new(arguments)
-            option.name = arguments[:long]
+      @options.each_value {|option|
+        case option.type
+          when :numeric
+            value = @parameters[option.long]
+            value = (value.to_i == value.to_f) ? value.to_i : value.to_f
 
-            @options[option.name] = option
+          when :boolean
+            value = @parameters[option.long] == 'true'
+
+          when :date
+            value = Date.parse(@parameters[option.long])
+
+          when :array
+            value = @parameters[option.long].split(/,/)
+
+          when :hash
+            value = Hash[@parameters[option.long].split(/,/).split(/=/)]
         end
 
-        def get (name)
-            @options[name]
-        end
-
-        def normalize
-            @parameters = {}
-            @arguments  = @data[:arguments]
-
-            @options.each_value {|option|
-              if option.default
-                @parameters[option.long.to_sym]  = option.default
-                @parameters[option.short.to_sym] = option.default
-              end
-            }
-
-            @data[:parameters].each {|key, value|
-                if value[:type] == :long
-                    if @options[key]
-                        @parameters[@options[key].long.to_sym]  = value[:value]
-                        @parameters[@options[key].short.to_sym] = value[:value]
-                    end
-                else
-                    @options.each_value {|option|
-                        if option.short == key
-                            @parameters[option.long.to_sym]  = value[:value]
-                            @parameters[option.short.to_sym] = value[:value]
-                        end
-                    }
-                end
-            }
-
-            @options.each_value {|option|
-              case option.type
-                when :numeric
-                  @parameters[option.long.to_sym]  = @parameters[option.long.to_sym].to_i
-                  @parameters[option.short.to_sym] = @parameters[option.short.to_sym].to_i
-              end
-            }
-        end
+        @parameters[option.long]  = value
+        @parameters[option.short] = value
+      }
     end
+  end
 
-    def initialize (parserOptions=nil)
-        super(Parser.new(self, parserOptions), Interface.new(self))
-    end
+  def initialize (parserOptions=nil)
+    super(Parser.new(self, parserOptions), Interface.new(self))
+  end
 end
 
 end
