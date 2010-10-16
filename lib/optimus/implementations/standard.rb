@@ -49,7 +49,7 @@ class Standard < Implementation
     end
   
     def parse (result, values, options=nil)
-      options   = @options.merge(options) if options.is_a? Hash
+      options = @options.merge(options) if options.is_a? Hash
       active  = nil
       type    = nil
   
@@ -64,15 +64,15 @@ class Standard < Implementation
           active = nil
         else
           if matches = value.match(/^#{Regexp.escape(@options[:separators][:long])}(\w+)$/)
-            active = matches[1]
+            active = matches[1].to_sym
             type = :long
           elsif matches = value.match(/^#{Regexp.escape(@options[:separators][:short])}(\w+)$/)
             if matches[1].length == 1
-              active = matches[1]
+              active = matches[1].to_sym
               type = :short
             else
               matches[1].chars.each {|char|
-                result.data[:parameters][char] = { :type => :short, :value => true }
+                result.data[:parameters][char.to_sym] = { :type => :short, :value => true }
               }
             end
           else
@@ -175,10 +175,10 @@ class Standard < Implementation
             value = Date.parse(@parameters[option.long])
 
           when :array
-            value = @parameters[option.long].split(/,/)
+            value = (@parameters[option.long] || '').split(/,/)
 
           when :hash
-            value = Hash[@parameters[option.long].split(/,/).split(/=/)]
+            value = Hash[(@parameters[option.long] || '').split(/,/).split(/=/)]
         end
 
         @parameters[option.long]  = value
