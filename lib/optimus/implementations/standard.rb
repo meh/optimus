@@ -179,6 +179,9 @@ class Standard < Implementation
 
           when :hash
             value = Hash[(@parameters[option.long] || '').split(/,/).split(/=/)]
+          
+          else
+            value = @parameters[option.long]
         end
 
         @parameters[option.long]  = value
