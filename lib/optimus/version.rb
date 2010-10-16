@@ -17,6 +17,6 @@
 #  along with optimus.  If not, see <http://www.gnu.org/licenses/>.
 
 class Optimus
-    Version = '0.0.1'
+    Version = '0.0.2'
 end
 
